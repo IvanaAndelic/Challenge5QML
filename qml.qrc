@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>channels.xml</file>
+        <file>search.jpg</file>
+        <file>back-button.jpg</file>
+        <file>empty_file.txt</file>
+        <file>pause.svg</file>
+        <file>play.svg</file>
+        <file>play-from-start.png</file>
+        <file>enter-outline.svg</file>
+        <file>exit-outline.svg</file>
+        <file>stop-button.png</file>
+    </qresource>
+</RCC>
