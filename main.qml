@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.15
 import QtMultimedia 5.15
 import QtLocation 5.15
 import QtQml 2.15
+import QtQuick.Controls 2.15
 
 
 Window {
@@ -23,8 +24,9 @@ Window {
 
         XmlRole { name: "uid"; query: "uid/string()" }
         XmlRole { name: "icon"; query: "icon/string()" }
-        XmlRole { name: "start"; query: "start/string()" }
-        XmlRole { name: "end"; query: "start/string()" }
+        //jesu li atributi za start i end dobro formatirani? Trebaju biti numerička vrijednost
+        XmlRole { name: "start"; query: "start/number()" }
+        XmlRole { name: "end"; query: "end/number()" }
         XmlRole { name: "url"; query: "url/string()" }
 
      }
@@ -50,8 +52,9 @@ Window {
             }
             else if(columns===2 && rows===1){
                 flow=GridLayout.LeftToRight
-                video.height=1060
+                video.height=window.height
                 video.width=parent.width*0.5
+
 
             }
         }
@@ -135,7 +138,7 @@ Window {
                     id:mouse2
                     anchors.fill:parent
 
-                    //Za sada ne radi
+                    //Za sada ne radi loadanje praznog fajla na klik na search image
                     onClicked: {
                         pageLoader.source = "empty_file.txt"
 
@@ -158,6 +161,74 @@ Window {
                  height:isFullScreen?window.height : 300
                  Layout.fillHeight: isFullScreen
                  Layout.fillWidth: isFullScreen
+
+                 //pokušaj dodavanja progress bara: from:start;to:end;value:current time mora biti
+                 //gray progress bar:
+                 ProgressBar{
+                     id:bufferBar
+                     anchors.bottom:video.bottom
+                     anchors.left:video.left
+                     width:video.width
+                     from:0
+                     to:1
+                     value:video.bufferProgress
+                     //indeterminate: true
+                     //Layout.fillWidth:true
+                     contentItem: Rectangle{
+                          anchors.left:bufferBar.left
+                          anchors.bottom:bufferBar.bottom
+                          height:bufferBar.height
+                          width:bufferBar.width*bufferBar.visualPosition
+                          color:"lightgray"
+                          opacity:0.75
+                     }
+                  }
+                 //Red position bar
+                /* ProgressBar{
+                     id:positionBar
+                     anchors.bottom:video.bottom
+                     anchors.left:video.left
+                     width:video.width
+                     from:0
+                     to:video.duration
+                     value:video.position
+                     background:Item{
+                         visible:false
+                     }
+                     contentItem: Rectangle{
+                         anchors.left:positionBar.left
+                         anchors.bottom:positionBar.bottom
+                         height:positionBar.height
+                         width:positionBar.width*positionBar.visualPosition
+                         color:"red"
+                     }
+                 }*/
+
+                 /*Slider{
+                     id:slider
+                     Layout.fillWidth: true
+                     from:start
+                     to:end
+                     stepSize:1
+                     value:50
+                     anchors.bottom:video.bottom
+
+
+                 }*/
+
+                 /*Timer{
+                     id:timer5
+                     running:true
+                     interval:500
+                     repeat:true
+
+
+                     onTriggered:{
+                         current_time=new Date().setTime()
+                         buffer.value= current.time
+                     }
+
+                 }*/
 
 
                  Image{
@@ -322,7 +393,7 @@ Window {
                     height:75
                     color:"#333333"
 
-
+                    //ovaj onFocusChanged trebao bi biti ispod rect2, ali ovako radi
                     onFocusChanged:{
                         if(focus){
                           console.log("fokus")
