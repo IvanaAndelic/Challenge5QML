@@ -24,7 +24,6 @@ Window {
 
         XmlRole { name: "uid"; query: "uid/string()" }
         XmlRole { name: "icon"; query: "icon/string()" }
-        //jesu li atributi za start i end dobro formatirani? Trebaju biti numerička vrijednost
         XmlRole { name: "start"; query: "start/number()" }
         XmlRole { name: "end"; query: "end/number()" }
         XmlRole { name: "url"; query: "url/string()" }
@@ -59,10 +58,15 @@ Window {
             }
         }
 
+
+
+
+
         Rectangle{
             id:rect3
             color:'black'
-            width:video.width
+            width:window.width
+            //width:isLandscape?window.width:1090
             height:75
             anchors.top:grid.top
             visible:isFullScreen?false:true
@@ -132,15 +136,15 @@ Window {
                 anchors.right:back_button.left
                 source:'qrc:search.jpg'
 
-                 Loader { id: pageLoader }
 
                 MouseArea{
                     id:mouse2
                     anchors.fill:parent
 
-                    //Za sada ne radi loadanje praznog fajla na klik na search image
                     onClicked: {
-                        pageLoader.source = "empty_file.txt"
+                        var component = Qt.createComponent("Child.qml")
+                        var window = component.createObject(window)
+                        window.show()
 
                     }
                 }
@@ -161,6 +165,9 @@ Window {
                  height:isFullScreen?window.height : 300
                  Layout.fillHeight: isFullScreen
                  Layout.fillWidth: isFullScreen
+                 property int start:0
+                 property int end:video.duration
+                 property int current_time: video.current_time//Qt.formatTime(new Date(), "mm:ss")
 
                  //pokušaj dodavanja progress bara: from:start;to:end;value:current time mora biti
                  //gray progress bar:
@@ -169,9 +176,9 @@ Window {
                      anchors.bottom:video.bottom
                      anchors.left:video.left
                      width:video.width
-                     from:0
-                     to:1
-                     value:video.bufferProgress
+                     from:start
+                     to:end
+                     value:current_time
                      //indeterminate: true
                      //Layout.fillWidth:true
                      contentItem: Rectangle{
@@ -184,14 +191,14 @@ Window {
                      }
                   }
                  //Red position bar
-                /* ProgressBar{
+                ProgressBar{
                      id:positionBar
                      anchors.bottom:video.bottom
                      anchors.left:video.left
                      width:video.width
-                     from:0
-                     to:video.duration
-                     value:video.position
+                     from:start
+                     to:end
+                     value:current_time
                      background:Item{
                          visible:false
                      }
@@ -202,7 +209,7 @@ Window {
                          width:positionBar.width*positionBar.visualPosition
                          color:"red"
                      }
-                 }*/
+                 }
 
                  /*Slider{
                      id:slider
@@ -233,11 +240,11 @@ Window {
 
                  Image{
                      id:play_from_start_image
-                     width:parent.width/5
-                     height:parent.height/5
+                     width:parent.width/7-15
+                     height:parent.height/7
                      anchors.right:play_image.left
                      anchors.verticalCenter: parent.verticalCenter
-                     source:'qrc:play-from-start.png'
+                     source:'qrc:play-skip-back-circle-outline.svg'
                      opacity:timer3.running?1.0:0.0
                      Behavior on opacity {
                          PropertyAnimation { duration: 5000 }
@@ -265,8 +272,8 @@ Window {
 
                  Image{
                      id:stop_image
-                     width:parent.width/5-20
-                     height:parent.height/5-20
+                     width:parent.width/9-11
+                     height:parent.height/9
                      anchors.left:play_image.right
                      anchors.verticalCenter: parent.verticalCenter
                      source:'qrc:stop-button.png'
@@ -297,8 +304,8 @@ Window {
 
                  Image{
                      id:play_image
-                     width:parent.width/5
-                     height:parent.height/5
+                     width:parent.width/7-15
+                     height:parent.height/7
                      anchors.centerIn: parent
                      source:'qrc:play.svg'
                      opacity:timer1.running?1.0:0.0
@@ -335,8 +342,8 @@ Window {
 
                  Image{
                      id:enter_exit_image
-                     width:parent.width/5
-                     height:parent.height/5
+                     width:parent.width/7-15
+                     height:parent.height/7
                      anchors.top:video.top
                      anchors.right:video.right
                      source: isFullScreen? 'qrc:enter-outline.svg':'qrc:exit-outline.svg'
@@ -367,13 +374,14 @@ Window {
 
                  }
 
+
         }
 
         ListView{
             id:list
             model:xmlModel
             width:video.width
-            height:parent.height-video.height
+            height:parent.height-video.height-rect3.height
             //pokusaj da 'zalijepim' listView za gornji rectangle kada je aktivan landscape mod:
             //anchors:isLandscape?rect3.bottom:video.bottom //anchors read only property error
             anchors.top:video.bottom
@@ -448,10 +456,9 @@ Window {
 
                         onClicked:{
                             list.currentIndex=index
-                            //console.log("klik"+ url)
                             video.source=url
                             video.play()
-                            //console.log(video.playbackState)
+
                         }
                     }
                  }
